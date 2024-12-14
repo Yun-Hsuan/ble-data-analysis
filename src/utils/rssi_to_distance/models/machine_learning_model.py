@@ -1,4 +1,4 @@
-from .base_model import RSSIToDistanceModel
+from utils.rssi_to_distance.base_model import RSSIToDistanceModel
 
 class MachineLearningModel(RSSIToDistanceModel):
     def __init__(self, model):

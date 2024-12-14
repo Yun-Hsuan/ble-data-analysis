@@ -1,5 +1,5 @@
 import unittest
-from src.utils.rssi_to_distance.lookup_model import LookupTableModel
+from utils.rssi_to_distance.models.lookup_model import LookupTableModel
 
 class TestLookupTableModel(unittest.TestCase):
     def setUp(self):
