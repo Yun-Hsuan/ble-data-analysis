@@ -1,0 +1,27 @@
+{
+  "cleaning_steps": [
+    {
+      "operation": "sort",
+      "params": {
+        "column": "eventTime",
+        "ascending": true
+      }
+    },
+    {
+      "operation": "filter",
+      "params": {
+        "column": "accessAddress",
+        "condition": "02",
+        "operation": "startswith"
+      }
+    },
+    {
+      "operation": "filter",
+      "params": {
+        "column": "accessAddress",
+        "condition": "ff4c00",
+        "operation": "contains"
+      }
+    }
+  ]
+}

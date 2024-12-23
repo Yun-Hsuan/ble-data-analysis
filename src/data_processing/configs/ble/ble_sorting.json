@@ -1,0 +1,11 @@
+{
+  "cleaning_steps": [
+    {
+      "operation": "sort",
+      "params": {
+        "column": "eventTime",
+        "ascending": true
+      }
+    }
+  ]
+}

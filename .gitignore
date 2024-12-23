@@ -4,3 +4,17 @@
 __pycache__/
 *.pyc
 *.pyo
+
+docs/
+
+report.py
+
+main.py
+
+data/
+
+NikeAdidas_Overview_Report.xlsx
+
+output_report/
+
+daily_reports/
