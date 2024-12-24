@@ -285,7 +285,10 @@ class ReportManager:
 
         with pd.ExcelWriter(self.comparison_report_path, engine="openpyxl") as writer:
             for indicator, df in comparison_data.items():
-                sheetname = indicator.split(" ")[0]
+                sheetname = indicator.replace("/", "_")
+
+                df = df.rename(index={"11:00:00-22:00:00": "Total"})
+                
                 df.to_excel(writer, sheet_name=sheetname, index=True)
 
                 # Apply percentage formatting if "率" is in the sheet name

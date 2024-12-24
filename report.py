@@ -20,11 +20,13 @@ def generate_overview_report(input_dir: str, output_path: str):
     :param output_path: Path to save the overview report.
     """
     input_dir = Path(input_dir)
-    report_files = sorted(input_dir.glob("terminal_report_*.xlsx"))
+    report_files = sorted(input_dir.glob("tenant_report_*.xlsx"))
 
     # Initialize storage for aggregated data
     nike_data = []
     adidas_data = []
+
+    print(report_files)
 
     # Process each daily report file
     for report_file in report_files:
@@ -33,20 +35,20 @@ def generate_overview_report(input_dir: str, output_path: str):
 
         for sheet_name in ["NIKE", "ADIDAS"]:
             df = excel_data.parse(sheet_name)
-            total_row = df[df['hour'] == "Total"]  # Filter the 'Total' row
+            total_row = df[df["日期"] == "Total"]  # Filter the 'Total' row
 
             if not total_row.empty:
                 metrics = {
-                    "date": date,
-                    "路過數 A": total_row["pass_by_count"].values[0],
-                    "靠櫃數 B": total_row["entry_count"].values[0],
-                    "靠櫃率 B/A": total_row["entry_rate"].values[0],
-                    "停留數 C": total_row["stay_count_60s"].values[0],
-                    "停留率 C/B": total_row["stay_rate_60s"].values[0],
-                    "交易數 D": total_row["transaction_count"].values[0],
-                    "提袋率 D/C": total_row["bag_rate_gt_60s"].values[0],
-                    "提袋率 D/B": total_row["bag_rate_gt_0s"].values[0],
-                    "平均停留 (秒)": total_row["average_dwell_time"].values[0],
+                    "日期": date,
+                    "路過數 A": total_row["行經數 A"].values[0],
+                    "靠櫃數 B": total_row["入櫃數 B"].values[0],
+                    "靠櫃率 B/A": total_row["入櫃率 B/A"].values[0],
+                    "停留數 C": total_row["停留數 C"].values[0],
+                    "停留率 C/B": total_row["停留率 C/B"].values[0],
+                    "交易數 D": total_row["交易數 D"].values[0],
+                    "提袋率 D/C": total_row["提袋率 D/C"].values[0],
+                    "提袋率 D/B": total_row["提袋率 D/B"].values[0],
+                    # "平均停留 (秒)": total_row["平均停留時長 (s)"].values[0],
                 }
                 if sheet_name == "NIKE":
                     nike_data.append(metrics)
@@ -94,11 +96,14 @@ def date_range(start_date: str, end_date: str):
 
 if __name__ == "__main__":
 
-    # Example usage
-    # generate_overview_report(
-    #     input_dir="./output_report",
-    #     output_path="NikeAdidas_Overview_Report.xlsx"
-    # )
+    #Example usage
+    generate_overview_report(
+        input_dir="./daily_reports",
+        output_path="./daily_reports/NikeAdidas_Overview_Report.xlsx"
+    )
+
+    exit()
+
     date_list = date_range("2024-12-19", "2024-12-22")
     for date in date_list:
         print(f"Processing date: {date}")
