@@ -67,3 +67,56 @@ class VisitRateIndicator(BaseTenantIndicator):
         merged_df["visitRate"] = merged_df["visitCount"] / merged_df["passByCount"]
 
         return merged_df
+    
+
+    def average_dwell_time(
+        self, time_interval: Optional[Tuple[datetime, datetime]]
+    ) -> pd.DataFrame:
+        """
+        Calculate the average dwell time for unique members in a given time interval for all terminals.
+
+        :param time_interval: A tuple containing start and end times for filtering.
+        :return: A pandas DataFrame with terminalId, tenantName, and average dwell time for each tenant.
+        """
+        results = []
+
+        for terminal_id, terminal_data in self.terminal_data["ble_cleaner"].items():
+            tenant_name = self.tenant_mapping.get(terminal_id, "Unknown")
+
+            terminal_data['eventTime'] = pd.to_datetime(terminal_data['eventTime'], errors='coerce')
+            terminal_data = terminal_data.dropna(subset=['eventTime'])
+
+            if terminal_data.empty:
+                results.append({"terminalId": terminal_id, "tenantName": tenant_name, "averageDwellTime": 0.0})
+                continue
+
+            # Filter data for the specified time interval
+            if time_interval:
+                start_time, end_time = time_interval
+                terminal_data = terminal_data[(terminal_data["eventTime"] >= start_time) & (terminal_data["eventTime"] <= end_time)]
+
+            if terminal_data.empty:
+                results.append({"terminalId": terminal_id, "tenantName": tenant_name, "averageDwellTime": 0.0})
+                continue
+
+            # Group by memberId and calculate first and last event times
+            member_dwell_times = terminal_data.groupby("memberId").agg(
+                first_time=("eventTime", "min"),
+                last_time=("eventTime", "max")
+            ).reset_index()
+
+            # Calculate dwell duration and filter positive durations
+            member_dwell_times["dwellDuration"] = (
+                member_dwell_times["last_time"] - member_dwell_times["first_time"]
+            ).dt.total_seconds()
+            member_dwell_times = member_dwell_times[member_dwell_times["dwellDuration"] > 0]
+
+            if member_dwell_times.empty:
+                results.append({"terminalId": terminal_id, "tenantName": tenant_name, "averageDwellTime": 0.0})
+                continue
+
+            # Calculate average dwell time
+            average_dwell_time = member_dwell_times["dwellDuration"].mean()
+            results.append({"terminalId": terminal_id, "tenantName": tenant_name, "averageDwellTime": average_dwell_time})
+
+        return pd.DataFrame(results)

@@ -99,7 +99,7 @@ if __name__ == "__main__":
     #     input_dir="./output_report",
     #     output_path="NikeAdidas_Overview_Report.xlsx"
     # )
-    date_list = date_range("2024-12-19", "2024-12-19")
+    date_list = date_range("2024-12-19", "2024-12-22")
     for date in date_list:
         print(f"Processing date: {date}")
 

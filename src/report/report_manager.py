@@ -57,6 +57,9 @@ class ReportManager:
                     dwell_rate_results = dwell_indicator.rate(visit_results)
                     bagging_rate_results = bagging_indicator.rate(dwell_results, visit_results)
 
+                    # Calculate average dwell time
+                    average_dwell_time_results = visit_indicator.average_dwell_time(time_interval=interval)
+
                     # Collect data for this tenant
                         # Collect data for this tenant
                     tenant_row = {
@@ -96,6 +99,13 @@ class ReportManager:
                         print(f"Warning: Missing bagging rate data for tenant '{tenant}' in time interval {interval}. Filling with 0.")
                         tenant_row.update({"baggingCount": 0, "baggingRate_60": 0, "baggingRate_visit": 0})
 
+                    # Check and update average_dwell_time_results
+                    average_dwell_time_filtered = average_dwell_time_results[average_dwell_time_results["tenantName"] == tenant]
+                    if not average_dwell_time_filtered.empty:
+                        tenant_row.update(average_dwell_time_filtered.to_dict(orient="records")[0])
+                    else:
+                        tenant_row.update({"averageDwellTime": 0})
+
                     tenant_data.append(tenant_row)
 
                 # Save tenant-specific data to its sheet
@@ -110,6 +120,7 @@ class ReportManager:
                         "visitCount": tenant_df["visitCount"].sum(),
                         "dwellCount_60": tenant_df["dwellCount_60"].sum(),
                         "baggingCount": tenant_df["baggingCount"].sum(),
+                        "averageDwellTime": tenant_df["averageDwellTime"].mean(),
                     }
 
                     # Calculate rates for "Total" row
@@ -148,6 +159,7 @@ class ReportManager:
                         "dwellRate_60": "停留率 C/B",
                         "baggingRate_60": "提袋率 D/C",
                         "baggingRate_visit": "提袋率 D/B",
+                        "averageDwellTime": "平均停留時長 (s)",
                     }
                     tenant_df = tenant_df.rename(columns=column_mapping)
                     tenant_df.to_excel(writer, sheet_name=tenant, index=False)
