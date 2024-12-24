@@ -198,9 +198,10 @@ class ReportManager:
         while start <= end:
             date_str = start.strftime("%Y-%m-%d")
             time_intervals = [
-                (datetime(start.year, start.month, start.day, hour, 0),
-                datetime(start.year, start.month, start.day, hour + 1, 0))
+                (datetime(start.year, start.month, start.day, hour + (minute + 15) // 60, (minute + 15) % 60),
+                datetime(start.year, start.month, start.day, hour + (minute + 30) // 60, (minute + 30) % 60))
                 for hour in range(11, 22)
+                for minute in range(0, 60, 15)
             ]
 
             self.generate_daily_report(
@@ -254,9 +255,9 @@ class ReportManager:
         """
         indicators = [
             "行經數 A", "入櫃數 B", "入櫃率 B/A", "停留數 C",
-            "停留率 C/B", "交易數 D", "提袋率 D/C", "提袋率 D/B"
+            "停留率 C/B", "交易數 D", "提袋率 D/C", "提袋率 D/B", "平均停留時長 (s)"
         ]
-        #, "平均停留時長 (s)"
+        
         comparison_data: Dict[str, pd.DataFrame] = {}
 
         for indicator in indicators:

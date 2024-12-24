@@ -82,7 +82,7 @@ if __name__ == "__main__":
     )
     exit()
 
-    start_date = "2024-12-19"
+    start_date = "2024-12-09"
     end_date = "2024-12-22"
 
     # 將日期字串轉換為 datetime 對象

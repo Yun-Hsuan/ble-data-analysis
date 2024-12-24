@@ -2,7 +2,6 @@ import pandas as pd
 from pathlib import Path
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import NamedStyle, numbers
-import json
 import pandas as pd
 from datetime import datetime, timedelta
 from src.data_processing.cleaners.ble_cleaner import BLECleaner
@@ -48,7 +47,7 @@ def generate_overview_report(input_dir: str, output_path: str):
                     "交易數 D": total_row["交易數 D"].values[0],
                     "提袋率 D/C": total_row["提袋率 D/C"].values[0],
                     "提袋率 D/B": total_row["提袋率 D/B"].values[0],
-                    # "平均停留 (秒)": total_row["平均停留時長 (s)"].values[0],
+                    "平均停留 (秒)": total_row["平均停留時長 (s)"].values[0],
                 }
                 if sheet_name == "NIKE":
                     nike_data.append(metrics)
@@ -97,14 +96,14 @@ def date_range(start_date: str, end_date: str):
 if __name__ == "__main__":
 
     #Example usage
-    generate_overview_report(
-        input_dir="./daily_reports",
-        output_path="./daily_reports/NikeAdidas_Overview_Report.xlsx"
-    )
+    # generate_overview_report(
+    #    input_dir="./daily_reports",
+    #    output_path="./daily_reports/NikeAdidas_Overview_Report.xlsx"
+    # )
 
-    exit()
+    # exit()
 
-    date_list = date_range("2024-12-19", "2024-12-22")
+    date_list = date_range("2024-12-22", "2024-12-22")
     for date in date_list:
         print(f"Processing date: {date}")
 
