@@ -83,8 +83,17 @@ class VisitRateIndicator(BaseTenantIndicator):
         for terminal_id, terminal_data in self.terminal_data["ble_cleaner"].items():
             tenant_name = self.tenant_mapping.get(terminal_id, "Unknown")
 
-            terminal_data['eventTime'] = pd.to_datetime(terminal_data['eventTime'], errors='coerce')
+            # Apply RSSI filtering if thresholds are provided
+            if self._entry_rssi_threshold and terminal_id in self._entry_rssi_threshold:
+                threshold = self._entry_rssi_threshold[terminal_id]
+                terminal_data = terminal_data[terminal_data['rssi'] > threshold]
+            
+            # terminal_data['eventTime'] = pd.to_datetime(terminal_data['eventTime'], errors='coerce')
+            # terminal_data = terminal_data.dropna(subset=['eventTime'])
+
+            terminal_data.loc[:, 'eventTime'] = pd.to_datetime(terminal_data['eventTime'], errors='coerce')
             terminal_data = terminal_data.dropna(subset=['eventTime'])
+            terminal_data['eventTime'] = pd.to_datetime(terminal_data['eventTime'])
 
             if terminal_data.empty:
                 results.append({"terminalId": terminal_id, "tenantName": tenant_name, "averageDwellTime": 0.0})

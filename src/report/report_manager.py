@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Optional, Dict
 from pathlib import Path
 import json
 from datetime import datetime, timedelta
@@ -16,10 +16,15 @@ class ReportManager:
     Manages the generation of daily tenant reports based on multiple indicators.
     """
 
-    def __init__(self, output_dir: str, tenant_mapping_path: str):
+    def __init__(self, output_dir: str = "", 
+                 tenant_mapping_path: str = "", 
+                 daily_reports_dir: str = "", 
+                 comparison_report_path: str = ""):
         self.output_dir = Path(output_dir)
         self.tenant_mapping_path = tenant_mapping_path
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.daily_reports_dir = Path(daily_reports_dir)
+        self.comparison_report_path = Path(comparison_report_path)
 
     def generate_daily_report(
         self,
@@ -207,3 +212,92 @@ class ReportManager:
                 time_interval=time_intervals
             )
             start += timedelta(days=1)
+
+    def load_tenant_data(self, start_date: str, end_date: str) -> pd.DataFrame:
+        """
+        Load tenant data from daily reports within the specified date range.
+
+        :param start_date: Start date in 'YYYY-MM-DD' format.
+        :param end_date: End date in 'YYYY-MM-DD' format.
+        :return: A unified DataFrame containing data for all tenants and dates.
+        """
+        start_date = pd.to_datetime(start_date)
+        end_date = pd.to_datetime(end_date)
+
+        all_data = []
+
+        for report_file in self.daily_reports_dir.glob("tenant_report_*.xlsx"):
+            date_str = report_file.stem.split("_")[-1]
+            report_date = pd.to_datetime(date_str, format="%Y-%m-%d", errors="coerce")
+
+            if report_date is None or report_date < start_date or report_date > end_date:
+                continue
+
+            print(f"Loading report: {report_file}")
+            excel_data = pd.ExcelFile(report_file)
+
+            for sheet_name in excel_data.sheet_names:
+                tenant_df = excel_data.parse(sheet_name=sheet_name)
+                tenant_df["櫃位"] = sheet_name
+                all_data.append(tenant_df)
+
+        if not all_data:
+            raise ValueError("No reports found within the specified date range.")
+
+        return pd.concat(all_data, ignore_index=True)
+
+    def generate_comparison_report(self, tenant_data: pd.DataFrame):
+        """
+        Generate a comparison report for all tenants.
+
+        :param tenant_data: DataFrame containing all tenant data to be compared.
+        """
+        indicators = [
+            "行經數 A", "入櫃數 B", "入櫃率 B/A", "停留數 C",
+            "停留率 C/B", "交易數 D", "提袋率 D/C", "提袋率 D/B"
+        ]
+        #, "平均停留時長 (s)"
+        comparison_data: Dict[str, pd.DataFrame] = {}
+
+        for indicator in indicators:
+            indicator_data = tenant_data[["日期", "時間區間", "櫃位", indicator]]
+
+            # Create pivot table
+            pivot_table = indicator_data.pivot(
+                index="時間區間", columns="櫃位", values=indicator
+            )
+
+            # Extract and remove the total row from the pivot table
+            total_row = pivot_table.loc["11:00:00-22:00:00"] if "11:00:00-22:00:00" in pivot_table.index else None
+            pivot_table = pivot_table.drop(index="11:00:00-22:00:00", errors="ignore")
+
+            # Sort the remaining rows
+            pivot_table = pivot_table.sort_index()
+
+            # Append the total row at the bottom
+            if total_row is not None:
+                total_row = pd.DataFrame([total_row], index=["11:00:00-22:00:00"])
+                pivot_table = pd.concat([pivot_table, total_row])
+            
+            # Add date column for context
+            pivot_table["日期"] = tenant_data["日期"].iloc[0]
+            comparison_data[indicator] = pivot_table
+
+        with pd.ExcelWriter(self.comparison_report_path, engine="openpyxl") as writer:
+            for indicator, df in comparison_data.items():
+                sheetname = indicator.split(" ")[0]
+                df.to_excel(writer, sheet_name=sheetname, index=True)
+
+                # Apply percentage formatting if "率" is in the sheet name
+                if "率" in sheetname:
+                    workbook = writer.book
+                    worksheet = writer.sheets[sheetname]
+                    for row_idx in range(2, len(df) + 2):  # Exclude header row
+                        for col_idx in range(2, len(df.columns) + 2):  # Skip index column
+                            cell = worksheet.cell(row=row_idx, column=col_idx)
+                            cell.number_format = "0.00%"
+
+        print(f"Comparison report generated: {self.comparison_report_path}")
+
+
+    
