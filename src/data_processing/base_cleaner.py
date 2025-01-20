@@ -28,6 +28,12 @@ class BaseCleaner(ABC):
         :return: Loaded pandas DataFrame.
         """
         self.data = self.data_manager.load_files(pattern=pattern, sheet_name_column=sheet_name_column)
+        #print(self.data.columns)
+        #print(self.data['accessAddress'].head())
+        if 'accessAddress' in self.data.columns: 
+            self.data = self.data[self.data['accessAddress'].str[14:20] == 'ff4c00']
+        #print(self.data)
+        #exit()
         return self.data
     
 

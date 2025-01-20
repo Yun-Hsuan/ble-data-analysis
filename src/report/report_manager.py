@@ -48,7 +48,7 @@ class ReportManager:
                 print(f"Processing tenant: {tenant}")
                 tenant_data = []
                 
-                if tenant == "ADIDAS ORIGINALS":
+                if tenant == "ADIDAS ORIGINALS" or tenant == "GODIVA CORNER":
                     continue
 
                 for interval in time_interval:

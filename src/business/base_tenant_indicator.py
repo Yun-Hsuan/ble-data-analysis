@@ -125,7 +125,13 @@ class BaseTenantIndicator(ABC):
             profile_result[cleaner_name] = {}
             for terminal_id, data in terminals.items():
                 tenant_name = self.tenant_mapping.get(terminal_id, None)
-
+                
+                if terminal_id in self._pass_by_rssi_threshold:
+                    threshold = self._pass_by_rssi_threshold[terminal_id]
+                    #print(data)
+                    if 'rssi' in data.columns:
+                        data = data[data['rssi'] > threshold]
+                
                 profile_result[cleaner_name][terminal_id] = {
                     "tenantName": tenant_name,
                     "row_count": len(data),
