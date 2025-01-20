@@ -197,13 +197,19 @@ class ReportManager:
 
         while start <= end:
             date_str = start.strftime("%Y-%m-%d")
+            # time_intervals = [
+            #     (datetime(start.year, start.month, start.day, hour + (minute + 15) // 60, (minute + 15) % 60),
+            #     datetime(start.year, start.month, start.day, hour + (minute + 30) // 60, (minute + 30) % 60))
+            #     for hour in range(11, 22)
+            #     for minute in range(0, 60, 15)
+            # 
             time_intervals = [
-                (datetime(start.year, start.month, start.day, hour + (minute + 15) // 60, (minute + 15) % 60),
-                datetime(start.year, start.month, start.day, hour + (minute + 30) // 60, (minute + 30) % 60))
+                (
+                    datetime(start.year, start.month, start.day, hour, 0),
+                    datetime(start.year, start.month, start.day, hour + 1, 0)
+                )
                 for hour in range(11, 22)
-                for minute in range(0, 60, 15)
             ]
-
             self.generate_daily_report(
                 date=date_str,
                 pass_by_indicator=pass_by_indicator,
