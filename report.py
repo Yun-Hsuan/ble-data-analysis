@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
     # exit()
 
-    date_list = date_range("2024-12-22", "2024-12-22")
+    date_list = date_range("2025-03-29", "2025-03-30")
     for date in date_list:
         print(f"Processing date: {date}")
 
@@ -116,28 +116,28 @@ if __name__ == "__main__":
         pass_by_indicator = PassByIndicator()
         pass_by_indicator.set_cleaner("ble_cleaner", ble_cleaner)
         pass_by_indicator.set_cleaner("transaction_cleaner", transaction_cleaner)
-        pass_by_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable.xlsx")
-        pass_by_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds.xlsx")
+        pass_by_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
+        pass_by_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy3.xlsx")
 
         visit_indicator = VisitRateIndicator()
         visit_indicator.set_cleaner("ble_cleaner", ble_cleaner)
         visit_indicator.set_cleaner("transaction_cleaner", transaction_cleaner)
-        visit_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable.xlsx")
-        visit_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds.xlsx")
+        visit_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
+        visit_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy3.xlsx")
 
         dwell_indicator = DwellRateIndicator([60])
         dwell_indicator.set_cleaner("ble_cleaner", ble_cleaner)
         dwell_indicator.set_cleaner("transaction_cleaner", transaction_cleaner)
-        dwell_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable.xlsx")
-        dwell_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds.xlsx")
+        dwell_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
+        dwell_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy3.xlsx")
 
         bagging_indicator = BaggingRateIndicator()
         bagging_indicator.set_cleaner("ble_cleaner", ble_cleaner)
         bagging_indicator.set_cleaner("transaction_cleaner", transaction_cleaner)
-        bagging_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable.xlsx")
-        bagging_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds.xlsx")
+        bagging_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
+        bagging_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy3.xlsx")
 
-        report_manager = ReportManager(output_dir="./daily_reports", tenant_mapping_path="./data/processed/tenant_info/tenant_terminalId_mappingtable.xlsx")
+        report_manager = ReportManager(output_dir="./daily_reports", tenant_mapping_path="./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
 
         report_manager.generate_reports_for_date_range(
             start_date=date,
