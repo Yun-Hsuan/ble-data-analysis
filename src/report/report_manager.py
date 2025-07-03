@@ -205,10 +205,9 @@ class ReportManager:
             # 
             time_intervals = [
                 (
-                    datetime(start.year, start.month, start.day, hour, 0),
-                    datetime(start.year, start.month, start.day, hour + 1, 0)
+                    datetime(start.year, start.month, start.day, 11, 0),
+                    datetime(start.year, start.month, start.day, 22, 0)
                 )
-                for hour in range(11, 22)
             ]
             self.generate_daily_report(
                 date=date_str,
@@ -268,6 +267,19 @@ class ReportManager:
 
         for indicator in indicators:
             indicator_data = tenant_data[["日期", "時間區間", "櫃位", indicator]]
+
+            # 檢查重複資料
+            duplicates = indicator_data.duplicated(subset=['日期', '時間區間', '櫃位'], keep=False)
+            if duplicates.any():
+                print(f"\n發現重複資料 - 指標: {indicator}")
+                print(indicator_data[duplicates])
+                
+                # 對重複資料進行聚合（取平均）
+                indicator_data = indicator_data.groupby(['日期', '時間區間', '櫃位']).agg({
+                    indicator: 'mean'
+                }).reset_index()
+                
+                print(f"已處理重複資料，使用平均值")
 
             # Create pivot table
             pivot_table = indicator_data.pivot(

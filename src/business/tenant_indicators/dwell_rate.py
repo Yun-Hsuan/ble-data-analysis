@@ -1,5 +1,5 @@
-from business.base_tenant_indicator import BaseTenantIndicator
-from business.tenant_indicators.analytic_methods.dwell_rate_methods import DwellRateMethods
+from src.business.base_tenant_indicator import BaseTenantIndicator
+from src.business.tenant_indicators.analytic_methods.dwell_rate_methods import DwellRateMethods
 from datetime import datetime
 from typing import Optional, Dict, Tuple, List
 import pandas as pd

@@ -1,5 +1,5 @@
-from business.base_tenant_indicator import BaseTenantIndicator
-from business.tenant_indicators.analytic_methods.bagging_rate_methods import BaggingRateMethods
+from src.business.base_tenant_indicator import BaseTenantIndicator
+from src.business.tenant_indicators.analytic_methods.bagging_rate_methods import BaggingRateMethods
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Tuple
 import pandas as pd

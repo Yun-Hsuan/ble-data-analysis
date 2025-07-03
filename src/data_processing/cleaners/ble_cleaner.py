@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import json
-from data_processing.base_cleaner import BaseCleaner
+from ..base_cleaner import BaseCleaner
 
 class BLECleaner(BaseCleaner):
     """
@@ -17,6 +17,13 @@ class BLECleaner(BaseCleaner):
         """
         if self.data is None:
             raise ValueError("No data loaded. Call 'load_data()' first.")
+
+        # 檢查是否需要處理無 header 的情況
+        if not any(col in self.data.columns for col in ["POSCode", "UserId", "PLICd", "PLIEventCd", "PLIEventTimestamp", "Distance", "RawData"]):
+            # 定義欄位順序
+            columns = ["BeaconRecordId", "ConglomeratedId", "StoreId", "POSCode", "UserId", "PLICd", "PLIEventCd", "PLIEventTimestamp", "Distance", "RawData", "Source"]
+            # 重新命名欄位
+            self.data.columns = columns
 
         # Define column name mapping (new column names -> old column names)
         column_mapping = {
@@ -64,35 +71,56 @@ class BLECleaner(BaseCleaner):
             Handle invalid or empty values gracefully.
             """
             if not isinstance(value, str) or value.strip() == "":
-                # Handle empty or non-string values
+                print(f"空值或非字串值: {value}")
                 return None
 
             value = value.strip()  # Remove leading/trailing whitespace
+            #print(f"處理時間值: {value}")
 
             try:
+                # 檢查是否已經是 24 小時制格式（包含毫秒）
+                if ".000" in value:
+                    # 將日期中的 - 替換為 /
+                    result = value.replace(".000", "").replace("-", "/")
+                    #print(f"24小時制格式（含毫秒）: {value} -> {result}")
+                    return result
+                
                 if "上午" in value:
-                    # Remove '上午' and return cleaned time
-                    return value.replace("上午", "").strip()
+                    result = value.replace("上午", "").strip()
+                    #print(f"上午格式: {value} -> {result}")
+                    return result
                 elif "下午" in value:
-                    # Process '下午' and convert to 24-hour format
-                    date_part, time_part = value.replace("下午", "").strip().split("  ")
+                    try:
+                        # 嘗試處理有兩個空格的情況
+                        date_part, time_part = value.replace("下午", "").strip().split("  ")
+                        #print(f"下午格式（兩個空格）: {value}")
+                    except ValueError:
+                        # 如果失敗，嘗試處理有一個空格的情況
+                        date_part, time_part = value.replace("下午", "").strip().split(" ")
+                        #print(f"下午格式（一個空格）: {value}")
+                    
                     hour, minute, second = map(int, time_part.split(":"))
                     if hour != 12:  # Avoid converting 12 PM to 24
                         hour += 12
                     time_part = f"{hour}:{minute:02}:{second:02}"
-                    return f"{date_part} {time_part}"
+                    result = f"{date_part} {time_part}"
+                    #print(f"下午轉換結果: {value} -> {result}")
+                    return result
                 else:
-                    # Assume already valid format
+                    #print(f"其他格式（直接返回）: {value}")
                     return value
             except (ValueError, IndexError) as e:
                 # Log invalid values and return None
-                print(f"Invalid time format encountered: {value}. Error: {e}")
+                print(f"時間格式轉換錯誤: {value}. 錯誤: {e}")
                 return None
 
         # Apply the conversion function and extract only the date
-        print("Standardizing 'eventTime' column to date format...")
+        print("開始標準化 'eventTime' 欄位...")
+        print(f"轉換前的時間值範例:\n{self.data['eventTime'].head()}")
         self.data["eventTime"] = self.data["eventTime"].map(convert_to_24_hour_format)
+        print(f"轉換後的時間值範例:\n{self.data['eventTime'].head()}")
         self.data["eventTime"] = pd.to_datetime(self.data["eventTime"], format="%Y/%m/%d %H:%M:%S", errors="coerce")
+        print(f"最終轉換為 datetime 後的範例:\n{self.data['eventTime'].head()}")
 
         # Log invalid rows
         invalid_rows = self.data[self.data["eventTime"].isna()]

@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from data_processing.base_cleaner import BaseCleaner
+from ..base_cleaner import BaseCleaner
 
 class TransactionCleaner(BaseCleaner):
     """

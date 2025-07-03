@@ -29,12 +29,12 @@ def generate_overview_report(input_dir: str, output_path: str):
     # 處理每個每日報告檔案
     for report_file in report_files:
         # 從檔案名稱中提取日期和樓層資訊
-        file_name = report_file.name
+        file_name = report_file.stem
         date = file_name.split("_")[-2]  # 提取日期
         floor = file_name.split("_")[-1]  # 提取樓層
         
         print(f"Processing file: {report_file}")
-        excel_data = pd.ExcelFile(report_file, engine='openpyxl')
+        excel_data = pd.ExcelFile(report_file)
 
         # 處理每個工作表（櫃位）
         for sheet_name in excel_data.sheet_names:
@@ -129,12 +129,12 @@ if __name__ == "__main__":
     #Example usage
     # generate_overview_report(
     #     input_dir="./daily_reports",
-    #     output_path="./daily_reports/tenant_overview_report_0512_0518.xlsx"
+    #     output_path="./daily_reports/NikeAdidas_Overview_Report.xlsx"
     # )
 
-    # exit()
+    #exit()
 
-    date_list = date_range("2025-06-01", "2025-06-01")
+    date_list = date_range("2025-05-12", "2025-05-18")
     for date in date_list:
         print(f"Processing date: {date}")
 
@@ -147,28 +147,28 @@ if __name__ == "__main__":
         pass_by_indicator = PassByIndicator()
         pass_by_indicator.set_cleaner("ble_cleaner", ble_cleaner)
         pass_by_indicator.set_cleaner("transaction_cleaner", transaction_cleaner)
-        pass_by_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
-        pass_by_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy3.xlsx")
+        pass_by_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy34.xlsx")
+        pass_by_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy34.xlsx")
 
         visit_indicator = VisitRateIndicator()
         visit_indicator.set_cleaner("ble_cleaner", ble_cleaner)
         visit_indicator.set_cleaner("transaction_cleaner", transaction_cleaner)
-        visit_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
-        visit_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy3.xlsx")
+        visit_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy34.xlsx")
+        visit_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy34.xlsx")
 
         dwell_indicator = DwellRateIndicator([60])
         dwell_indicator.set_cleaner("ble_cleaner", ble_cleaner)
         dwell_indicator.set_cleaner("transaction_cleaner", transaction_cleaner)
-        dwell_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
-        dwell_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy3.xlsx")
+        dwell_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy34.xlsx")
+        dwell_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy34.xlsx")
 
         bagging_indicator = BaggingRateIndicator()
         bagging_indicator.set_cleaner("ble_cleaner", ble_cleaner)
         bagging_indicator.set_cleaner("transaction_cleaner", transaction_cleaner)
-        bagging_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
-        bagging_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy3.xlsx")
+        bagging_indicator.set_tenant_mapping("./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy34.xlsx")
+        bagging_indicator.set_rssi_thresholds_from_file("./data/processed/tenant_info/tenant_rssi_thresholds_nancy34.xlsx")
 
-        report_manager = ReportManager(output_dir="./daily_reports", tenant_mapping_path="./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy3.xlsx")
+        report_manager = ReportManager(output_dir="./daily_reports2", tenant_mapping_path="./data/processed/tenant_info/tenant_terminalId_mappingtable_nancy34.xlsx")
 
         report_manager.generate_reports_for_date_range(
             start_date=date,
